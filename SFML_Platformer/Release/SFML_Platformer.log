@@ -1,0 +1,16 @@
+﻿  stdafx.cpp
+  Game.cpp
+  GameObjectManager.cpp
+  MainMenu.cpp
+  NewtonianObject.cpp
+  Platform.cpp
+  PlayerHero.cpp
+PlayerHero.cpp(23): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+PlayerHero.cpp(25): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+PlayerHero.cpp(29): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+  SFML_Platformer.cpp
+  SplashScreen.cpp
+  VisibleGameObject.cpp
+  Generating code
+  Finished generating code
+  SFML_Platformer.vcxproj -> C:\Users\JJ\Documents\Visual Studio 2012\Projects\SFML_Platformer - physics\Release\SFML_Platformer.exe
