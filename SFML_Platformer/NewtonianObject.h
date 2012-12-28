@@ -17,13 +17,16 @@ public:
 	void DoPhysics(sf::Time elapsedTime);
 	void OnGround(bool onGround);
 	void SetPosition(sf::Vector2f pos);
-	
+	sf::Vector2f GetVelocity();
+	void SetMaxSpeed(float speed);
+	float GetMaxSpeed();
+
 protected:
 	void SetVelocity(sf::Vector2f velocity);
-	sf::Vector2f GetVelocity();
 	void SetMass(float mass);
 	float GetMass();
 	float _maxSpeed;
+	
 
 private:
 	sf::Vector2f _velocity, _netForce, _pos;

@@ -1,4 +1,5 @@
 #pragma once
+#include "NewtonianObject.h"
 #include "VisibleGameObject.h"
 
 
@@ -12,6 +13,7 @@ public:
 	void Remove(std::string name);
 	int GetObjectCount() const;
 	VisibleGameObject* Get(std::string name) const;
+	NewtonianObject* GetNewtonian(std::string name) const;
 
 	void DrawAll(sf::RenderWindow& renderWindow);
 	void UpdateAll();

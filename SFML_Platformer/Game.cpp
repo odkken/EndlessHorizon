@@ -7,26 +7,19 @@ void Game::Start(void)
 {
 	if(_gameState != Uninitialized)
 		return;
-
 	_mainWindow.create(sf::VideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,32),"Pang!");
 
-	_mainWindow.setFramerateLimit(0);
-
-	_view.setSize(1024, 768);
-	_view.setCenter(_mainWindow.getDefaultView().getCenter());
+	_playerCamera.setSize(1024, 768);
+	_playerCamera.setCenter(_mainWindow.getDefaultView().getCenter());
 
 	PlayerHero *player1 = new PlayerHero();
 	player1->SetPosition(sf::Vector2f((SCREEN_WIDTH/2),500));
+	player1->SetMaxSpeed(20);
 	_gameObjectManager.Add("Player",player1);
 
 	VisibleGameObject *background = new VisibleGameObject();
 	background->Load("images/background.png");
 	_gameObjectManager.Add("Background", background);
-
-	//GameBall *ball = new GameBall();
-	//ball->SetPosition((SCREEN_WIDTH/2),(SCREEN_HEIGHT/2)-15);
-
-	//_gameObjectManager.Add("Ball",ball);
 
 	_gameState= Game::ShowingSplash;
 
@@ -71,24 +64,23 @@ void Game::GameLoop()
 		}
 	case Game::Playing:
 		{
-			_mainWindow.setView(_view);
+			UpdateView();
 			_mainWindow.clear(sf::Color(0,0,0));
-
 			_gameObjectManager.UpdateAll();
 			_gameObjectManager.DrawAll(_mainWindow);
 
 			_mainWindow.display();
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape) || currentEvent.type==sf::Event::Closed) _gameState = Game::Exiting;
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
-				_mainWindow.setFramerateLimit(60);
+				_mainWindow.setVerticalSyncEnabled(true);
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::G))
-				_mainWindow.setFramerateLimit(0);
+				_mainWindow.setVerticalSyncEnabled(false);
+			
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
 			{
-				NewtonianObject* player = (NewtonianObject*)_gameObjectManager.Get("Player");
-				player->SetPosition(sf::Vector2f(400,400));
-				player->Stop();
-				
+				_gameObjectManager.GetNewtonian("Player")->SetPosition(sf::Vector2f(400,400));
+				_gameObjectManager.GetNewtonian("Player")->Stop();
+				_playerCamera.move(_gameObjectManager.GetNewtonian("Player")->GetPosition().x - _playerCamera.getCenter().x, 0);
 			}
 			break;
 		}
@@ -97,7 +89,19 @@ void Game::GameLoop()
 
 sf::View& Game::GetView()
 {
-	return _view;
+	return _playerCamera;
+}
+
+//magic numbers for mathemagic
+void Game::UpdateView()
+{
+	// the third term keeps the camera ahead of the player, according to his current velocity.
+	float viewOffset = _gameObjectManager.Get("Player")->GetPosition().x - _playerCamera.getCenter().x + 10*_gameObjectManager.GetNewtonian("Player")->GetVelocity().x;
+	float velocity= (abs(viewOffset) > 100) ? .001f*abs(viewOffset)*viewOffset : 0;
+	float time = _gameClock.restart().asSeconds()*10;
+
+	_playerCamera.move(time*velocity, 0);
+	_mainWindow.setView(_playerCamera);
 }
 
 void Game::ShowSplashScreen()
@@ -107,6 +111,7 @@ void Game::ShowSplashScreen()
 	_gameState = Game::ShowingMenu;
 }
 
+
 void Game::ShowMenu()
 {
 	MainMenu mainMenu;
@@ -114,6 +119,7 @@ void Game::ShowMenu()
 	switch(result)
 	{
 	case MainMenu::Exit:
+		_gameClock.restart();
 		_gameState = Exiting;
 		break;
 	case MainMenu::Play:
@@ -125,4 +131,5 @@ void Game::ShowMenu()
 Game::GameState Game::_gameState = Uninitialized;
 sf::RenderWindow Game::_mainWindow;
 GameObjectManager Game::_gameObjectManager;
-sf::View Game::_view;
+sf::View Game::_playerCamera;
+sf::Clock Game::_gameClock;

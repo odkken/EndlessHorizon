@@ -32,7 +32,11 @@ VisibleGameObject* GameObjectManager::Get(std::string name) const
 	if(results == _gameObjects.end() )
 		return NULL;
 	return results->second;
-	
+}
+
+NewtonianObject* GameObjectManager::GetNewtonian(std::string name) const
+{
+	return (NewtonianObject*)Get(name);
 }
 
 int GameObjectManager::GetObjectCount() const

@@ -2,7 +2,7 @@
 #include "NewtonianObject.h"
 
 
-NewtonianObject::NewtonianObject() : _velocity(0,0), _mass(1.0f), _weight(_mass*9.8f), _COF(.8f), _FOF(_COF*_weight), _netForce(0,0)
+NewtonianObject::NewtonianObject() : _velocity(0,0), _mass(1.0f), _weight(_mass*9.8f), _COF(1.0f), _FOF(_COF*_weight), _netForce(0,0)
 {
 	_pos=GetPosition();
 }
@@ -43,6 +43,11 @@ void NewtonianObject::StopX()
 	_velocity.x=0.0f;
 }
 
+sf::Vector2f NewtonianObject::GetVelocity()
+{
+	return _velocity;
+}
+
 void NewtonianObject::DoPhysics(sf::Time elapsedTime)
 {
 	float deltaT = 15*elapsedTime.asSeconds(); //asMilliseconds doesn't work
@@ -53,12 +58,21 @@ void NewtonianObject::DoPhysics(sf::Time elapsedTime)
 	{
 		StopY();
 		_netForce.x+= (_velocity.x > 0) ? -_FOF : _FOF;
+
+		//if the only force is friction and the thing is pretty slow, stop it
+		if(abs(_velocity.x)<1.0f && abs(_netForce.x)==abs(_FOF))
+		{
+			_velocity.x=0;
+			_netForce.x=0;
+		}
 		_pos.y=500;
 	}
 
 	//good old kinematics
 	sf::Vector2f accel = _netForce/_mass;
 	sf::Vector2f newVel = _velocity + accel*deltaT;
+
+	//limit horizontal speed
 	if(abs(newVel.x) > _maxSpeed)
 		newVel= sf::Vector2f((newVel.x > 0) ? _maxSpeed : -_maxSpeed, newVel.y);
 
@@ -83,10 +97,16 @@ void NewtonianObject::SetVelocity(sf::Vector2f velocity)
 	_velocity=velocity;
 }
 
-sf::Vector2f NewtonianObject::GetVelocity()
+void NewtonianObject::SetMaxSpeed(float speed)
 {
-	return _velocity;
+	_maxSpeed=speed;
 }
+
+float NewtonianObject::GetMaxSpeed()
+{
+	return _maxSpeed;
+}
+
 
 void NewtonianObject::SetMass(float mass)
 {

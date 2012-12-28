@@ -3,13 +3,13 @@
 #include "Game.h"
 
 
-PlayerHero::PlayerHero() : NewtonianObject(), sensitivity(50)
+PlayerHero::PlayerHero() : NewtonianObject(), sensitivity(15)
 {
 	Load("images/runner.png");
 	assert(IsLoaded());
 	OnGround(false);
-	_maxSpeed=20;
 	GetSprite().setOrigin(GetSprite().getGlobalBounds().width /2, GetSprite().getGlobalBounds().height / 2);
+	_maxSpeed=20;
 }
 
 PlayerHero::~PlayerHero()
