@@ -3,6 +3,7 @@
 #include "MainMenu.h"
 #include "SplashScreen.h"
 #include "NewtonianObject.h"
+#include "Platform.h"
 void Game::Start(void)
 {
 	if(_gameState != Uninitialized)
@@ -14,12 +15,17 @@ void Game::Start(void)
 
 	PlayerHero *player1 = new PlayerHero();
 	player1->SetPosition(sf::Vector2f((SCREEN_WIDTH/2),500));
-	player1->SetMaxSpeed(20);
+	player1->SetMaxSpeed(40);
 	_gameObjectManager.Add("Player",player1);
+	
+	Platform *ground = new Platform(1000,50,0,600);
+	_gameObjectManager.Add("ground", ground);
 
-	VisibleGameObject *background = new VisibleGameObject();
-	background->Load("images/background.png");
-	_gameObjectManager.Add("Background", background);
+	for (int i=0; i<10; ++i)
+	{
+		Platform *plat = new Platform(100,30,100 + 300*i, 500);
+		_gameObjectManager.Add("Platform" + i, plat);
+	}
 
 	_gameState= Game::ShowingSplash;
 
@@ -65,7 +71,7 @@ void Game::GameLoop()
 	case Game::Playing:
 		{
 			UpdateView();
-			_mainWindow.clear(sf::Color(0,0,0));
+			_mainWindow.clear(sf::Color(50,200,255));
 			_gameObjectManager.UpdateAll();
 			_gameObjectManager.DrawAll(_mainWindow);
 
@@ -75,7 +81,7 @@ void Game::GameLoop()
 				_mainWindow.setVerticalSyncEnabled(true);
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::G))
 				_mainWindow.setVerticalSyncEnabled(false);
-			
+
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
 			{
 				_gameObjectManager.GetNewtonian("Player")->SetPosition(sf::Vector2f(400,400));
@@ -96,7 +102,7 @@ sf::View& Game::GetView()
 void Game::UpdateView()
 {
 	// the third term keeps the camera ahead of the player, according to his current velocity.
-	float viewOffset = _gameObjectManager.Get("Player")->GetPosition().x - _playerCamera.getCenter().x + 10*_gameObjectManager.GetNewtonian("Player")->GetVelocity().x;
+	float viewOffset = _gameObjectManager.Get("Player")->GetPosition().x+_gameObjectManager.Get("Player")->GetBounds().width/2.0f - _playerCamera.getCenter().x + 10*_gameObjectManager.GetNewtonian("Player")->GetVelocity().x;
 	float velocity= (abs(viewOffset) > 100) ? .001f*abs(viewOffset)*viewOffset : 0;
 	float time = _gameClock.restart().asSeconds()*10;
 

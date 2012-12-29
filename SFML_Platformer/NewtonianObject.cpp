@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "NewtonianObject.h"
+#include "Game.h"
 
 
 NewtonianObject::NewtonianObject() : _velocity(0,0), _mass(1.0f), _weight(_mass*9.8f), _COF(1.0f), _FOF(_COF*_weight), _netForce(0,0)
 {
+	_closestPlatform = IsLoaded()? GetSprite().getGlobalBounds() : GetShape().getGlobalBounds();
 	_pos=GetPosition();
 }
 
@@ -25,7 +27,7 @@ void NewtonianObject::Push(sf::Vector2f force)
 
 void NewtonianObject::OnGround(bool onGround)
 {
-	_onGround=onGround;
+	_touchingGround=onGround;
 }
 
 void NewtonianObject::Stop()
@@ -48,25 +50,20 @@ sf::Vector2f NewtonianObject::GetVelocity()
 	return _velocity;
 }
 
+void NewtonianObject::SetClosest(const sf::RectangleShape& closestPlatform)
+{
+	_closestPlatform = closestPlatform.getGlobalBounds();
+}
+
 void NewtonianObject::DoPhysics(sf::Time elapsedTime)
 {
+	if (_touchingGround)
+		GroundCalc(_closestPlatform.top);
+	_touchingGround=false;
+
 	float deltaT = 15*elapsedTime.asSeconds(); //asMilliseconds doesn't work
 	_netForce.y += _weight; //comment out for no gravity
 
-	//temporary ground until real implementation
-	if (_pos.y >= 500)
-	{
-		StopY();
-		_netForce.x+= (_velocity.x > 0) ? -_FOF : _FOF;
-
-		//if the only force is friction and the thing is pretty slow, stop it
-		if(abs(_velocity.x)<1.0f && abs(_netForce.x)==abs(_FOF))
-		{
-			_velocity.x=0;
-			_netForce.x=0;
-		}
-		_pos.y=500;
-	}
 
 	//good old kinematics
 	sf::Vector2f accel = _netForce/_mass;
@@ -81,15 +78,31 @@ void NewtonianObject::DoPhysics(sf::Time elapsedTime)
 
 	SetPosition(_pos);
 
-	//temporary edgeless world
-	if(GetPosition().x<0) SetPosition(sf::Vector2f(1024,GetPosition().y));
-	if(GetPosition().x>1024) SetPosition(sf::Vector2f(0,GetPosition().y));
-
 	//clean up for next run
 	_velocity = newVel;
 	_netForce*=0.0f;
+}
 
+void NewtonianObject::GroundCollide(bool touchingGround)
+{
+	_touchingGround=touchingGround;
+}
 
+void NewtonianObject::GroundCalc(float surfacePosition)
+{
+	//because that's what actually happens, and you'll sink into the floor if you don't
+	StopY();
+
+	//kinetic friction
+	Push(sf::Vector2f((_velocity.x > 0) ? -_FOF : _FOF, 0));
+
+	//if the only force is friction and the thing is pretty slow, stop it (static friction lol)
+	if(abs(_velocity.x)<1.0f && abs(_netForce.x) == _FOF)
+	{
+		_velocity.x=0;
+		_netForce.x=0;
+	}
+	_pos.y=surfacePosition-GetSprite().getGlobalBounds().height;
 }
 
 void NewtonianObject::SetVelocity(sf::Vector2f velocity)

@@ -4,7 +4,8 @@
 
 VisibleGameObject::VisibleGameObject()
 {
-  _isLoaded = false;
+	_isLoaded = false;
+	_isShape = false;
 }
 
 
@@ -15,25 +16,25 @@ VisibleGameObject::~VisibleGameObject()
 
 void VisibleGameObject::Load(std::string filename)
 {
-  if(_image.loadFromFile(filename) == false)
-  {
-    _filename = "";
-    _isLoaded = false;
-  }
-  else
-  {
-    _filename = filename;
-	_sprite.setTexture(_image);
-    _isLoaded = true;
-  }
+	if(_image.loadFromFile(filename) == false)
+	{
+		_filename = "";
+		_isLoaded = false;
+	}
+	else
+	{
+		_filename = filename;
+		_sprite.setTexture(_image);
+		_isLoaded = true;
+	}
 }
 
 void VisibleGameObject::Draw(sf::RenderWindow & renderWindow)
 {
-  if(_isLoaded)
-  {
-    renderWindow.draw(_sprite);
-  }
+	if(_isLoaded)
+		renderWindow.draw(_sprite);
+	else if(_isShape)
+		renderWindow.draw(_shape);
 }
 
 void VisibleGameObject::Update(sf::Time elapsedTime)
@@ -42,27 +43,37 @@ void VisibleGameObject::Update(sf::Time elapsedTime)
 
 void VisibleGameObject::SetPosition(sf::Vector2f pos)
 {
-  if(_isLoaded)
-  {
-    _sprite.setPosition(pos.x,pos.y);
-  }
+	if(_isLoaded)
+	{
+		_sprite.setPosition(pos.x,pos.y);
+	}
 }
 
 bool VisibleGameObject::IsLoaded() const
 {
-  return _isLoaded;
+	return _isLoaded;
 }
 
 sf::Vector2f VisibleGameObject::GetPosition() const
 {
-  if(_isLoaded)
-  {
-    return _sprite.getPosition();
-  }
-  return sf::Vector2f();
+	if(_isLoaded)
+	{
+		return _sprite.getPosition();
+	}
+	return sf::Vector2f();
 }
 
 sf::Sprite& VisibleGameObject::GetSprite()
 {
-  return _sprite;
+	return _sprite;
+}
+
+sf::RectangleShape& VisibleGameObject::GetShape()
+{
+	return _shape;
+}
+
+sf::FloatRect VisibleGameObject::GetBounds()
+{
+	return IsLoaded()? _sprite.getGlobalBounds() : _shape.getGlobalBounds();
 }

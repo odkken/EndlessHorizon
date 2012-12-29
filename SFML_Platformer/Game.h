@@ -2,12 +2,13 @@
 #include "SFML/Window.hpp"
 #include "SFML/Graphics.hpp"
 #include "PlayerHero.h"
-//#include "Background.h"
 #include "GameObjectManager.h"
+#include "Platform.h"
 
 class Game
 {
 public:
+	static GameObjectManager _gameObjectManager;
 	static void Start();
 	static sf::RenderWindow& GetWindow();
 	static sf::View& GetView();
@@ -30,5 +31,4 @@ private:
 	static GameState _gameState;
 	static sf::RenderWindow _mainWindow;
 	static sf::View _playerCamera;
-	static GameObjectManager _gameObjectManager;
 };
