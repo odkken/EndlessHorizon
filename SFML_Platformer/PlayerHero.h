@@ -11,6 +11,6 @@ public:
 
 private:
 	
-	int sensitivity; //sets acceleration control for movement
+	float sensitivity; //sets acceleration control for movement
 
 };

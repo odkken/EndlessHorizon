@@ -9,6 +9,8 @@ Platform::Platform(float width, float height, float x, float y)
 	_shape.setSize(sf::Vector2f(width,height));
 	_shape.setPosition(x,y);
 	_shape.setFillColor(sf::Color::Red);
+	_shape.setOutlineThickness(-4);
+	_shape.setOutlineColor(sf::Color(0,0,0,127));
 }
 
 
@@ -18,12 +20,13 @@ Platform::~Platform(void)
 
 void Platform::Update(sf::Time elapsedTime)
 {
-	static PlayerHero& player = *(PlayerHero*)Game::_gameObjectManager.Get("Player");
+	_shape.setOutlineColor(sf::Color(0,0,0,127));
+	static PlayerHero& player = *(PlayerHero*)Game::_gameObjectManager.Get("APlayer");
 	static struct box {float top, right, left, bottom;} playerBox, platformBox;
 	
 	static sf::FloatRect playerRect;
 	//update playerbox
-	playerRect = player.GetSprite().getGlobalBounds();
+	playerRect = player.GetBounds();
 	playerBox.left = playerRect.left;
 	playerBox.top = playerRect.top;
 	playerBox.right = playerBox.left + playerRect.width;
@@ -38,16 +41,17 @@ void Platform::Update(sf::Time elapsedTime)
 	//check for player colliding with this platform
 	if (
 		(
-			(playerBox.left < platformBox.left && playerBox.right > platformBox.left) //straddling left edge
+			(playerBox.left <= platformBox.left && playerBox.right >= platformBox.left) //straddling left edge
 			||
-			(playerBox.left > platformBox.left && playerBox.right < platformBox.right) //all the way in
+			(playerBox.left >= platformBox.left && playerBox.right <= platformBox.right) //all the way in
 			||
-			(playerBox.left < platformBox.right && playerBox.right > platformBox.right) //straddling right
+			(playerBox.left <= platformBox.right && playerBox.right >= platformBox.right) //straddling right
 		)
 		&&
-		(playerBox.bottom > platformBox.top && playerBox.bottom < platformBox.bottom) //only if you're trying to fall into the platform
+		(playerBox.bottom >= platformBox.top && playerBox.bottom < platformBox.bottom && player.GetVelocity().y>0) //only if you're trying to fall into the platform
 	   )
 	{
+		_shape.setOutlineColor(sf::Color(255,255,255,255));
 		player.SetClosest(_shape);
 		player.GroundCollide(true);
 	}

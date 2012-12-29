@@ -47,6 +47,10 @@ void VisibleGameObject::SetPosition(sf::Vector2f pos)
 	{
 		_sprite.setPosition(pos.x,pos.y);
 	}
+	else
+	{
+		_shape.setPosition(pos.x, pos.y);
+	}
 }
 
 bool VisibleGameObject::IsLoaded() const
@@ -57,9 +61,9 @@ bool VisibleGameObject::IsLoaded() const
 sf::Vector2f VisibleGameObject::GetPosition() const
 {
 	if(_isLoaded)
-	{
 		return _sprite.getPosition();
-	}
+	if(_isShape)
+		return _shape.getPosition();
 	return sf::Vector2f();
 }
 
@@ -75,5 +79,5 @@ sf::RectangleShape& VisibleGameObject::GetShape()
 
 sf::FloatRect VisibleGameObject::GetBounds()
 {
-	return IsLoaded()? _sprite.getGlobalBounds() : _shape.getGlobalBounds();
+	return IsLoaded()? _sprite.getGlobalBounds() : _isShape? _shape.getGlobalBounds() : sf::FloatRect();
 }

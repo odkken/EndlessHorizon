@@ -5,7 +5,8 @@
 
 NewtonianObject::NewtonianObject() : _velocity(0,0), _mass(1.0f), _weight(_mass*9.8f), _COF(1.0f), _FOF(_COF*_weight), _netForce(0,0)
 {
-	_closestPlatform = IsLoaded()? GetSprite().getGlobalBounds() : GetShape().getGlobalBounds();
+	//set it to itself initially, gets overridden as soon as platforms are updated
+	_closestPlatform = GetBounds();
 	_pos=GetPosition();
 }
 
@@ -17,7 +18,7 @@ NewtonianObject::~NewtonianObject()
 void NewtonianObject::SetPosition(sf::Vector2f pos)
 {
 	_pos=pos;
-	GetSprite().setPosition(pos.x, pos.y);
+	VisibleGameObject::SetPosition(_pos);
 }
 
 void NewtonianObject::Push(sf::Vector2f force)
@@ -102,7 +103,7 @@ void NewtonianObject::GroundCalc(float surfacePosition)
 		_velocity.x=0;
 		_netForce.x=0;
 	}
-	_pos.y=surfacePosition-GetSprite().getGlobalBounds().height;
+	_pos.y=surfacePosition-GetBounds().height;
 }
 
 void NewtonianObject::SetVelocity(sf::Vector2f velocity)

@@ -6,9 +6,9 @@
 
 PlayerHero::PlayerHero() : sensitivity(15)
 {
-	_isShape=false;
-	Load("images/runner.png");
-	assert(IsLoaded());
+	_isShape=true;
+	_shape.setFillColor(sf::Color::Blue);
+	_shape.setSize(sf::Vector2f(20, 40));
 	_maxSpeed=30;
 }
 
@@ -24,7 +24,7 @@ void PlayerHero::Update(sf::Time elapsedTime)
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
 		Push(sf::Vector2f(sensitivity,0));
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && _touchingGround)
-		Push(sf::Vector2f(0, -3/elapsedTime.asSeconds()));
+		Push(sf::Vector2f(0, -3.0f/elapsedTime.asSeconds()));
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
 		Push(sf::Vector2f(0,GetMass()*9.8));
 
