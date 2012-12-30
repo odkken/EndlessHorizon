@@ -1,3 +1,2 @@
-﻿  PlayerHero.cpp
-c:\users\jj\documents\visual studio 2012\projects\sfml_platformer - physics\sfml_platformer\playerhero.cpp(29): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+﻿  Platform.cpp
   SFML_Platformer.vcxproj -> C:\Users\JJ\Documents\Visual Studio 2012\Projects\SFML_Platformer - physics\Debug\SFML_Platformer.exe

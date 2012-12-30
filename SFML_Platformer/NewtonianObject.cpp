@@ -62,7 +62,7 @@ void NewtonianObject::DoPhysics(sf::Time elapsedTime)
 		GroundCalc(_closestPlatform.top);
 	_touchingGround=false;
 
-	float deltaT = 15*elapsedTime.asSeconds(); //asMilliseconds doesn't work
+	float deltaT = .000015f*elapsedTime.asMicroseconds(); //asMilliseconds doesn't work
 	_netForce.y += _weight; //comment out for no gravity
 
 
@@ -72,7 +72,7 @@ void NewtonianObject::DoPhysics(sf::Time elapsedTime)
 
 	//limit horizontal speed
 	if(abs(newVel.x) > _maxSpeed)
-		newVel= sf::Vector2f((newVel.x > 0) ? _maxSpeed : -_maxSpeed, newVel.y);
+		newVel = sf::Vector2f((newVel.x > 0) ? _maxSpeed : -_maxSpeed, newVel.y);
 
 	//move the object by averaging the velocity before and after this frame (this is exact for constant accelerations)
 	_pos +=(_velocity + newVel)*deltaT/2.0f; //using a dedicated position because I don't trust GetPosition to interpolate between pixels
