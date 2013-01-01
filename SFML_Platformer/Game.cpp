@@ -7,38 +7,71 @@
 #include <random>
 void Game::Start(void)
 {
+	const int PLAT_WIDTH = 100;
+	const int PLAT_HEIGHT = 90;
 	if(_gameState != Uninitialized)
 		return;
 	_mainWindow.create(sf::VideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,32),"Pang!");
 
-	_playerCamera.setSize(1024, 768);
-	_playerCamera.setCenter(_mainWindow.getDefaultView().getCenter());
 
 
 	//create player
 	PlayerHero *player1 = new PlayerHero();
-	player1->SetPosition(sf::Vector2f((SCREEN_WIDTH/5),500));
+	player1->SetPosition(sf::Vector2f(0,300));
 	player1->SetMaxSpeed(40);
-	_gameObjectManager.Add("CPlayer",player1);
+	player1->name="CPlayer";
+	_gameObjectManager.Add(player1->name,player1);
 	
+	_playerCamera.setSize(1024, 768);
+	_playerCamera.setCenter(_mainWindow.getDefaultView().getCenter());
+
 	//create distinct starting platform
-	Platform *ground = new Platform(1000,50,SCREEN_WIDTH/5,600, 0);
-	_gameObjectManager.Add("Bground", ground);
+	Platform *ground = new Platform(1000000,300,-500000,600, (Platform::note)-1);
+	ground->name="Bground";
+	_gameObjectManager.Add(ground->name, ground);
 
+	//NOTES//////////////
+	std::vector< std::vector<Platform::note> > chords;
+	typedef Platform::note qnote;
 
-	//procedurally create "pixel" platforms.  Need to make a class to do this (worldcreator)
+	chords.push_back(MakeChord(qnote::cs1,qnote::f1,qnote::as2));
+	chords.push_back(MakeChord(qnote::c1,qnote::f1,qnote::a2));
+	chords.push_back(MakeChord(qnote::cs1,qnote::f1,qnote::as2));
+	chords.push_back(MakeChord(qnote::c1,qnote::f1,qnote::a2));
+	chords.push_back(MakeChord(qnote::cs1,qnote::f1,qnote::as2));
+	chords.push_back(MakeChord(qnote::ds1,qnote::gs1,qnote::c2));
+	chords.push_back(MakeChord(qnote::f1,qnote::gs1,qnote::cs2));
+	chords.push_back(MakeChord(qnote::ds1,qnote::gs1,qnote::c2));
+	chords.push_back(MakeChord(qnote::f1,qnote::gs1,qnote::cs2));
+	chords.push_back(MakeChord(qnote::f1,qnote::as2,qnote::d2));
+	chords.push_back(MakeChord(qnote::fs1,qnote::as2,qnote::ds2));
+	chords.push_back(MakeChord(qnote::f1,qnote::as2,qnote::d2));
+	chords.push_back(MakeChord(qnote::fs1,qnote::as2,qnote::ds2));
+	chords.push_back(MakeChord(qnote::g1,qnote::cs2,qnote::e2));
+	chords.push_back(MakeChord(qnote::as2,qnote::c2,qnote::f2));
+	chords.push_back(MakeChord(qnote::as2,qnote::c2,qnote::f2));
+	chords.push_back(MakeChord(qnote::a2,qnote::c2,qnote::f2));
+	chords.push_back(MakeChord(qnote::a2,qnote::c2,qnote::f2));
+	//procedurally create "pixel" platforms.  Need to make a class to do this 
 	std::mt19937 mt;
 	mt.seed(_gameClock.getElapsedTime().asMicroseconds());
 	std::uniform_real_distribution<float> dr;
 	std::uniform_int_distribution<int> di(0,2);
 
-	for (int i=0; i<30; ++i)
+	
+	int i=0;
+	int j=0;
+	for (std::vector<Platform::note> chord : chords)
 	{
-		for (int color=0; color<3; ++color)
+		for (Platform::note note : chord)
 		{
-			Platform *plat = new Platform(30,90,500 + 300*i+30*color, 500, color);
-			_gameObjectManager.Add("BPlatform" + std::to_string(i) + "_" + std::to_string(color), plat);
+			Platform *plat = new Platform(PLAT_WIDTH,PLAT_HEIGHT,(PLAT_WIDTH*3 + 200)*i+PLAT_WIDTH*j, 500 +5*j, note);
+			plat->name="BPlatform" + std::to_string(i) + "_" + std::to_string(j);
+			_gameObjectManager.Add(plat->name, plat);
+			++j;
 		}
+		j=0;
+		++i;
 	}
 
 	_gameState= Game::ShowingSplash;
@@ -98,7 +131,7 @@ void Game::GameLoop()
 
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
 			{
-				_gameObjectManager.GetNewtonian("CPlayer")->SetPosition(sf::Vector2f(400,400));
+				_gameObjectManager.GetNewtonian("CPlayer")->SetPosition(sf::Vector2f(0,300));
 				_gameObjectManager.GetNewtonian("CPlayer")->Stop();
 				_playerCamera.move(_gameObjectManager.GetNewtonian("CPlayer")->GetPosition().x - _playerCamera.getCenter().x, 0);
 			}
@@ -135,6 +168,15 @@ void Game::ShowSplashScreen()
 	_gameState = Game::ShowingMenu;
 }
 
+
+std::vector<Platform::note> Game::MakeChord(Platform::note root, Platform::note third, Platform::note fifth)
+	{
+		std::vector<Platform::note> chord;
+		chord.push_back(root);
+		chord.push_back(third);
+		chord.push_back(fifth);
+	return chord;	
+}
 
 void Game::ShowMenu()
 {

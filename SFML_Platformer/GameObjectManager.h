@@ -9,6 +9,7 @@ public:
 	GameObjectManager();
 	~GameObjectManager();
 
+	void Reassign(std::string name, VisibleGameObject* newObject);
 	void Add(std::string name, VisibleGameObject* gameObject);
 	void Remove(std::string name);
 	int GetObjectCount() const;

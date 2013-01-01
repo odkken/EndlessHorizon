@@ -4,6 +4,7 @@
 
 VisibleGameObject::VisibleGameObject()
 {
+	name="";
 	_isLoaded = false;
 	_isShape = false;
 }

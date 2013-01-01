@@ -11,6 +11,13 @@ GameObjectManager::~GameObjectManager()
 	std::for_each(_gameObjects.begin(),_gameObjects.end(),GameObjectDeallocator());
 }
 
+void GameObjectManager::Reassign(std::string name, VisibleGameObject* newObject)
+{
+	std::map<std::string, VisibleGameObject*>::iterator results = _gameObjects.find(name);
+	if(results != _gameObjects.end() )
+		_gameObjects[name]=newObject;
+}
+
 void GameObjectManager::Add(std::string name, VisibleGameObject* gameObject)
 {
 	_gameObjects.insert(std::pair<std::string,VisibleGameObject*>(name,gameObject));

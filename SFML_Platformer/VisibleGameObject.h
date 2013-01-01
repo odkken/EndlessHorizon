@@ -5,6 +5,7 @@ public:
 	VisibleGameObject();
 	virtual ~VisibleGameObject();
 
+	std::string name;
 	virtual void Load(std::string filename);
 	void Draw(sf::RenderWindow & window);
 	virtual void Update(sf::Time elapsedTime);

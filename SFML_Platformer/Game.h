@@ -18,6 +18,7 @@ public:
 	static float MAX_SPEED;
 
 private:
+	static std::vector<Platform::note> MakeChord(Platform::note root, Platform::note third, Platform::note fifth);
 	static bool IsExiting();
 	static void GameLoop();
 	static void ShowSplashScreen();
